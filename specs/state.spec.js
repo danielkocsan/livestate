@@ -42,7 +42,7 @@ describe('State object', function () {
     });
 
     describe('onChange method', function () {
-        it('should call event handler when dom element changes', function () {
+        it('should subscribe event handler on dom element changes', function () {
             var spy = jasmine.createSpy(),
                 testElement = $('<div />');
 
@@ -52,7 +52,7 @@ describe('State object', function () {
             expect(spy).toHaveBeenCalled();
         });
 
-        it('should call event handler when property changes', function () {
+        it('should subscribe event handler on property changes', function () {
             var spy = jasmine.createSpy(),
                 testElement = $('<div />');
 
@@ -60,6 +60,19 @@ describe('State object', function () {
             SUT.onChange('testProp', spy);
             SUT.set('testProp', 'testValue');
             expect(spy).toHaveBeenCalled();
+        });
+    });
+
+    describe('onChangeTo method', function () {
+        it('should subscribe event handler on dom element changes to specific value', function () {
+            var spy = jasmine.createSpy(),
+                testElement = $('<div />');
+
+            SUT.bind('testProp', testElement);
+            SUT.onChangeTo('testProp', 'specificValue', spy);
+            testElement.val('testValue').trigger('change');
+            testElement.val('specificValue').trigger('change');
+            expect(spy.calls.count()).toEqual(1);
         });
     });
 });

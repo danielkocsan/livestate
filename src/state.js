@@ -18,6 +18,17 @@ var state = (function () {
         }
     }
 
+    function handleChange(property, value, eventHandler) {
+        if (!state[property] || !state[property].domCollection || !(eventHandler instanceof Function)) {
+            return;
+        }
+        if (!(state[property].changeHandlers[value] instanceof Array)) {
+            state[property].changeHandlers[value] = [];
+        }
+
+        state[property].changeHandlers[value].push(eventHandler);
+    }
+
     return {
         bind: function (property, domCollection) {
             setupProperty(property, domCollection);
@@ -50,14 +61,11 @@ var state = (function () {
         },
 
         onChange: function (property, eventHandler) {
-            if (!state[property] || !state[property].domCollection || !(eventHandler instanceof Function)) {
-                return;
-            }
-            if (!(state[property].changeHandlers[null] instanceof Array)) {
-                state[property].changeHandlers[null] = [];
-            }
+            handleChange(property, null, eventHandler);
+        },
 
-            state[property].changeHandlers[null].push(eventHandler);
+        onChangeTo: function (property, value, eventHandler) {
+            handleChange(property, value, eventHandler);
         }
     };
 }());

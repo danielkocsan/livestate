@@ -42,13 +42,23 @@ describe('State object', function () {
     });
 
     describe('onChange method', function () {
-        it('should call event handler if dom element changes', function () {
+        it('should call event handler when dom element changes', function () {
             var spy = jasmine.createSpy(),
                 testElement = $('<div />');
 
             SUT.bind('testProp', testElement);
             SUT.onChange('testProp', spy);
             testElement.val('testValue').trigger('change');
+            expect(spy).toHaveBeenCalled();
+        });
+
+        it('should call event handler when property changes', function () {
+            var spy = jasmine.createSpy(),
+                testElement = $('<div />');
+
+            SUT.bind('testProp', testElement);
+            SUT.onChange('testProp', spy);
+            SUT.set('testProp', 'testValue');
             expect(spy).toHaveBeenCalled();
         });
     });

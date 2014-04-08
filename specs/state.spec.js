@@ -16,8 +16,8 @@ describe('State object', function () {
     });
 
 
-    describe('can bind properties and node elements', function () {
-        it('SHOULD update property when dom element changes', function () {
+    describe('bind function', function () {
+        it('should propagate update of property when dom element changes', function () {
             var mockValue = 'a',
                 mockElement = $('<div />');
 
@@ -28,7 +28,19 @@ describe('State object', function () {
             expect(SUT.get('myProp')).toEqual(mockValue);
         });
 
-        it('SHOULD update dom element when property changes', function () {
+        it('should propagate update of property when given dom event occur', function () {
+            var mockValue = 'a',
+                mockElement = $('<div />'),
+                testDOMEvent = 'focusOut';
+
+            SUT.bind('myProp', mockElement, [testDOMEvent]);
+
+            mockElement.val(mockValue).trigger(testDOMEvent);
+
+            expect(SUT.get('myProp')).toEqual(mockValue);
+        });
+
+        it('should propagate update of dom element when property changes', function () {
             var mockValue = 'a',
                 mockElement = $('<div />');
 
@@ -41,13 +53,13 @@ describe('State object', function () {
         });
     });
 
-    describe('onChange method', function () {
+    describe('subscribe function', function () {
         it('should subscribe event handler on dom element changes', function () {
             var spy = jasmine.createSpy(),
                 testElement = $('<div />');
 
             SUT.bind('testProp', testElement);
-            SUT.onChange('testProp', spy);
+            SUT.subscribe('testProp', spy);
             testElement.val('testValue').trigger('change');
             expect(spy).toHaveBeenCalled();
         });
@@ -57,21 +69,32 @@ describe('State object', function () {
                 testElement = $('<div />');
 
             SUT.bind('testProp', testElement);
-            SUT.onChange('testProp', spy);
+            SUT.subscribe('testProp', spy);
             SUT.set('testProp', 'testValue');
             expect(spy).toHaveBeenCalled();
         });
     });
 
-    describe('onChangeTo method', function () {
+    describe('onChangeTo function', function () {
         it('should subscribe event handler on dom element changes to specific value', function () {
             var spy = jasmine.createSpy(),
                 testElement = $('<div />');
 
             SUT.bind('testProp', testElement);
-            SUT.onChangeTo('testProp', 'specificValue', spy);
+            SUT.subscribe('testProp', spy, 'specificValue');
             testElement.val('testValue').trigger('change');
             testElement.val('specificValue').trigger('change');
+            expect(spy.calls.count()).toEqual(1);
+        });
+
+        it('should subscribe event handler on property changes to specific value', function () {
+            var spy = jasmine.createSpy(),
+                testElement = $('<div />');
+
+            SUT.bind('testProp', testElement);
+            SUT.subscribe('testProp', spy, 'specificValue');
+            SUT.set('testProp', 'testValue');
+            SUT.set('testProp', 'specificValue');
             expect(spy.calls.count()).toEqual(1);
         });
     });

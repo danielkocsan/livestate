@@ -18,24 +18,19 @@ var state = (function () {
         }
     }
 
-    function handleChange(property, value, eventHandler) {
-        if (!state[property] || !state[property].domCollection || !(eventHandler instanceof Function)) {
-            return;
-        }
-        if (!(state[property].changeHandlers[value] instanceof Array)) {
-            state[property].changeHandlers[value] = [];
-        }
-
-        state[property].changeHandlers[value].push(eventHandler);
-    }
-
     return {
-        bind: function (property, domCollection) {
+        bind: function (property, domCollection, domEvents) {
+            var events = domEvents;
             setupProperty(property, domCollection);
-            domCollection.on('change', function () {
-                state[property].value = this.value;
-                callChangeHandlers(property, this.value);
-                callChangeHandlers(property, null);
+            if (!(events instanceof Array)) {
+                events = ['change'];
+            }
+            events.forEach(function (event) {
+                domCollection.on(event, function () {
+                    state[property].value = this.value;
+                    callChangeHandlers(property, this.value);
+                    callChangeHandlers(property, null);
+                });
             });
         },
         get: function (property) {
@@ -60,12 +55,20 @@ var state = (function () {
             state = {};
         },
 
-        onChange: function (property, eventHandler) {
-            handleChange(property, null, eventHandler);
-        },
+        subscribe: function (property, eventHandler, val) {
+            var value = val;
+            if (!state[property] || !state[property].domCollection || !(eventHandler instanceof Function)) {
+                return;
+            }
+            if (!value) {
+                value = null;
+            }
 
-        onChangeTo: function (property, value, eventHandler) {
-            handleChange(property, value, eventHandler);
+            if (!(state[property].changeHandlers[value] instanceof Array)) {
+                state[property].changeHandlers[value] = [];
+            }
+
+            state[property].changeHandlers[value].push(eventHandler);
         }
     };
 }());

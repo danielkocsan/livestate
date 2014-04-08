@@ -35,6 +35,14 @@ var state = (function () {
 
         reset: function () {
             state = {};
+        },
+
+        onChange: function (property, eventHandler) {
+            if (!state[property] || !state[property].domCollection || !(eventHandler instanceof Function)) {
+                return;
+            }
+
+            state[property].domCollection.on('change', eventHandler);
         }
     };
 }());

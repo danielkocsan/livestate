@@ -1,4 +1,4 @@
-/*global $, state, describe, it, beforeEach, expect */
+/*global $, state, jasmine, describe, it, beforeEach, expect */
 describe('State object', function () {
     'use strict';
     var SUT;
@@ -38,6 +38,18 @@ describe('State object', function () {
 
             expect(mockElement.val()).toEqual(mockValue);
             expect(SUT.get('myProp')).toEqual(mockValue);
+        });
+    });
+
+    describe('onChange method', function () {
+        it('should call event handler if dom element changes', function () {
+            var spy = jasmine.createSpy(),
+                testElement = $('<div />');
+
+            SUT.bind('testProp', testElement);
+            SUT.onChange('testProp', spy);
+            testElement.val('testValue').trigger('change');
+            expect(spy).toHaveBeenCalled();
         });
     });
 });

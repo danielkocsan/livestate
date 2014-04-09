@@ -51,6 +51,31 @@ describe('State object', function () {
             expect(mockElement.val()).toEqual(mockValue);
             expect(SUT.get('myProp')).toEqual(mockValue);
         });
+
+        it('should sync given app dom elements', function () {
+            var testDOM = $('<div><input class="first" /><input class="second" /></div>'),
+                testElements = testDOM.find('input'),
+                firstTestElement = testDOM.find('.first'),
+                secondTestElement = testDOM.find('.second');
+
+
+            SUT.bind('myProp', testElements, ['focusout']);
+            firstTestElement.val('testValue').trigger('keyup');
+
+            expect(secondTestElement.val()).toEqual('testValue');
+        });
+
+        it('should append bindings', function () {
+            var testElement1 = $('<div />'),
+                testElement2 = $('<span />');
+
+            SUT.bind('testProp', testElement1);
+            SUT.bind('testProp', testElement2);
+
+            SUT.set('testProp', 'testValue');
+            expect(testElement2.val()).toEqual('testValue');
+            expect(testElement1.val()).toEqual('testValue');
+        });
     });
 
     describe('subscribe function', function () {
@@ -73,9 +98,7 @@ describe('State object', function () {
             SUT.set('testProp', 'testValue');
             expect(spy).toHaveBeenCalled();
         });
-    });
 
-    describe('onChangeTo function', function () {
         it('should subscribe event handler on dom element changes to specific value', function () {
             var spy = jasmine.createSpy(),
                 testElement = $('<div />');
@@ -96,6 +119,16 @@ describe('State object', function () {
             SUT.set('testProp', 'testValue');
             SUT.set('testProp', 'specificValue');
             expect(spy.calls.count()).toEqual(1);
+        });
+
+        it('should pass new value to subscribed event handler', function () {
+            var spy = jasmine.createSpy(),
+                testElement = $('<div />');
+
+            SUT.bind('testProp', testElement);
+            SUT.subscribe('testProp', spy);
+            testElement.val('testValue').trigger('change');
+            expect(spy).toHaveBeenCalledWith('testValue');
         });
     });
 });

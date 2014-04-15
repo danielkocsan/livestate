@@ -1,16 +1,15 @@
-/*global $, state, jasmine, describe, it, beforeEach, expect */
-describe('State object', function () {
-    'use strict';
+describe('State module', function () {
     var SUT;
 
     beforeEach(function () {
-        SUT = state;
+        SUT = dio.di.getCustomInstance('State');
+        SUT.reset();
     });
 
     describe('can be reset', function () {
         it('SHOULD clear all properties after it was called', function () {
             SUT.set('myProp', 'value');
-            SUT.reset();
+            //SUT.reset();
             expect(SUT.get('myProp')).toBeUndefined();
         });
     });
@@ -99,36 +98,27 @@ describe('State object', function () {
             expect(spy).toHaveBeenCalled();
         });
 
-        it('should subscribe event handler on dom element changes to specific value', function () {
+        it('should pass new value and DOM event to subscribed event handler', function () {
             var spy = jasmine.createSpy(),
-                testElement = $('<div />');
-
-            SUT.bind('testProp', testElement);
-            SUT.subscribe('testProp', spy, 'specificValue');
-            testElement.val('testValue').trigger('change');
-            testElement.val('specificValue').trigger('change');
-            expect(spy.calls.count()).toEqual(1);
-        });
-
-        it('should subscribe event handler on property changes to specific value', function () {
-            var spy = jasmine.createSpy(),
-                testElement = $('<div />');
-
-            SUT.bind('testProp', testElement);
-            SUT.subscribe('testProp', spy, 'specificValue');
-            SUT.set('testProp', 'testValue');
-            SUT.set('testProp', 'specificValue');
-            expect(spy.calls.count()).toEqual(1);
-        });
-
-        it('should pass new value to subscribed event handler', function () {
-            var spy = jasmine.createSpy(),
-                testElement = $('<div />');
+                testElement = $('<div />'),
+                expectedObject = {
+                    value:  'testValue',
+                    event: 'change'
+                };
 
             SUT.bind('testProp', testElement);
             SUT.subscribe('testProp', spy);
             testElement.val('testValue').trigger('change');
-            expect(spy).toHaveBeenCalledWith('testValue');
+            expect(spy).toHaveBeenCalledWith(expectedObject);
+        });
+    });
+
+    describe('set function', function () {
+        it('should create state object node if it didnt exists', function () {
+            var testPath = 'root.alfa.betha.gamma',
+                testValue = 'testValue';
+            SUT.set(testPath, testValue);
+            expect(SUT.get(testPath)).toEqual(testValue);
         });
     });
 });

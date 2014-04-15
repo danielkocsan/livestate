@@ -1,0 +1,18 @@
+{
+    "expr": true,
+    "boss": true,
+    "loopfunc": true,
+    "browser": true,
+    "jquery": true,
+    "quotmark": true,
+    "eqeqeq": true,
+    "curly": true,
+    "eqnull": true,
+    "sub": true,
+    "evil": true,
+    "sub": true,
+    "nomen" : true,
+    "undef": true,
+    "unused": true,
+    "predef": [ "$", "dio", "jasmine", "describe", "beforeEach", "afterEach", "it", "expect", "runs", "waitsFor", "window" ]
+}

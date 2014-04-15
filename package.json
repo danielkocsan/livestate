@@ -10,8 +10,13 @@
   "author": "",
   "license": "BSD",
   "dependencies": {
-    "grunt-contrib-jasmine": "~0.6.3",
+    "grunt-contrib-jasmine": "~0.5.3",
     "grunt-contrib-watch": "~0.6.1",
-    "grunt-jslint": "~1.1.8"
+    "grunt-jslint": "~1.1.8",
+    "karma": "~0.12.6",
+    "karma-jasmine": "~0.1.5"
+  },
+  "devDependencies": {
+    "grunt-contrib-jshint": "~0.10.0"
   }
 }

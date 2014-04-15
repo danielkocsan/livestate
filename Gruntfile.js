@@ -17,20 +17,18 @@ module.exports = function(grunt) {
                 },
             },
 
-            jslint: {
-                default: {
-                    src: [
-                        'specs/**/*.js',
-                        'src/**/*.js'
-                    ]
-                }
+            jshint: {
+                all: [
+                    'specs/**/*.js',
+                    'src/**/*.js'
+                ]
             }
         }
     );
 
     grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks('grunt-contrib-jasmine');
-    grunt.loadNpmTasks('grunt-jslint');
+    grunt.loadNpmTasks('grunt-contrib-jshint');
 
-    grunt.registerTask('default', ['jasmine']);
+    grunt.registerTask('default', ['jshint', 'jasmine']);
 };

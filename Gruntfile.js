@@ -3,7 +3,7 @@ module.exports = function(grunt) {
         {
             jasmine: {
                 dev: {
-                    src: ['src/**/*.js', 'lib/**/*.js'],
+                    src: ['lib/di.js', 'src/**/*.js', 'lib/**/*.js'],
                     options: {
                         specs: 'specs/**/*.spec.js',
                         keepRunner: true
@@ -13,7 +13,7 @@ module.exports = function(grunt) {
             watch: {
                 js: {
                     files: ['specs/**/*.js', 'src/**/*.js'],
-                    tasks: ['jslint', 'jasmine']
+                    tasks: ['jshint', 'jasmine']
                 },
             },
 

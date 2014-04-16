@@ -113,7 +113,7 @@ describe('State module', function () {
         });
     });
 
-    describe('set function', function () {
+    xdescribe('set function', function () {
         it('should create state object node if it didnt exists', function () {
             var testPath = 'root.alfa.betha.gamma',
                 testValue = 'testValue';

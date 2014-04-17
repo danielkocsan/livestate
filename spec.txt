@@ -1,0 +1,102 @@
+
+stateObject
+---------
+
+- Interface
+It should have a set() method
+It should have a get() method
+It should have a getDOM() method
+It should have a getChildren() method
+It should have a subscribe() method
+It should have a reset() method
+It should have a bind() method
+*It should have a extend() method
+
+
+-
+GIVEN a element's value is set
+WHEN we call get method with the path only
+THEN it returns the set value
+
+
+-
+GIVEN a child element's value is set
+
+WHEN we call get method with the path only
+THEN it returns the set value
+
+*WHEN we call getChildren()
+*THEN it returns an array of strings of the next level children
+
+*WHEN we call extend() with an object
+*AND get is called on extended path
+*THEN it returns the set value
+
+*WHEN we call extend() with an object
+*AND get is called on merged path
+*THEN it returns the set value
+
+
+-
+GIVEN a element's attributes are set
+
+WHEN we call get method with the path and attribute name
+THEN it returns the set attribute value
+
+WHEN get is called with * as a secound parameter
+THEN it returns all the attributes
+
+
+-
+GIVEN it's a subscription on a property to 'change' event
+
+WHEN any attribute has changed
+OR the value has changed
+THEN the handler function should be called
+
+
+-
+*GIVEN it's a subscription on a property to 'childrenChange' event
+
+*WHEN any attribute OR the value has changed
+*on any children
+*THEN the handler function should be called with an object with the following properties
+*( eventName(str), elementPath(str), subscriptionPath(str), value(x),, attrs(obj), hasValueChanged(bool), changedAttributeName(str) )
+
+
+-
+GIVEN a DOM Node element is binded by 'change' event to an observable element
+WHEN the DOM element's value has changed
+THEN the property's value should be changed
+
+<------
+
+*WHEN getDOM() method has called
+*THEN it should return an array of Node elements with the one attached dom element
+
+
+-
+*GIVEN we have a non-(DOM Node element)
+
+*WHEN it's binded by 'change' event to an observable element
+*THEN it should throw an exception with message: 'only Node element is accepted for bind'
+
+
+-
+GIVEN multiple DOM elements are binded by 'change' event to an observable path
+
+WHEN any of the DOM elements' value has changed
+THEN the property's value should be changed
+AND all the other DOM elements' value should be changed
+
+WHEN getDOM() method has called
+THEN it should return an array of Node elements with all the attached dom elements
+
+GIVEN a DOM element is binded by 'submit' event to an observable element
+AND handler function is subscribed
+WHEN 'submit' DOM event has occurred
+THEN the subscribed function should be called with an object with the following properties
+( domEvent(obj), eventName(str), elementPath(str) )
+
+
+

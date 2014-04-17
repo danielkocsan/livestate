@@ -36,7 +36,7 @@ describe('LiveState object', function () {
             });
         });
 
-        describe('GIVEN a child elements value is set', function () {
+        describe('AND a child elements value is set', function () {
             var childMockProperty = 'a.b',
                 childMockValue = 'childElementValue';
 
@@ -155,14 +155,31 @@ describe('LiveState object', function () {
             });
 
             it('THEN the handler function should be called with proper parameters', function () {
+                var params,
+                    expectedParams = {
+                        eventName: 'change',
+                        elementPath: mockElement,
+                        value: mockValue,
+                        attrs: {},
+                        hasValueChange: true,
+                        hasAttributeChange: false,
+                        changedAttributeName: undefined
+                    };
+
                 expect(handlerSpy).toHaveBeenCalled();
                 expect(handlerSpy.calls.length).toEqual(1);
-                expect(handlerSpy.calls[0].args[0]).toEqual('change');
-                expect(handlerSpy.calls[0].args[1]).toEqual(mockElement);
-                expect(handlerSpy.calls[0].args[2]).toEqual(mockValue);
-                expect(handlerSpy.calls[0].args[3]).toEqual({});
-                expect(handlerSpy.calls[0].args[4]).toEqual(true);
-                expect(handlerSpy.calls[0].args[5]).toBeUndefined();
+                expect(handlerSpy.calls[0].args.length).toEqual(1);
+
+                params = handlerSpy.calls[0].args[0];
+
+                expect(params.eventName).toBeDefined();
+                expect(params.elementPath).toBeDefined();
+                expect(params.value).toBeDefined();
+                expect(params.attrs).toBeDefined();
+                expect(params.hasValueChange).toBeDefined();
+                expect(params.hasAttributeChange).toBeDefined();
+
+                expect(params).toEqual(expectedParams);
             });
         });
 
@@ -173,14 +190,85 @@ describe('LiveState object', function () {
             });
 
             it('THEN the handler function should be called with proper parameters', function () {
+                var params,
+                    expectedParams = {
+                        eventName: 'change',
+                        elementPath: mockElement,
+                        value: undefined,
+                        attrs: mockAttributes,
+                        hasValueChange: false,
+                        hasAttributeChange: true,
+                        changedAttributeName: 'alpha'
+                    };
+
                 expect(handlerSpy).toHaveBeenCalled();
                 expect(handlerSpy.calls.length).toEqual(1);
-                expect(handlerSpy.calls[0].args[0]).toEqual('change');
-                expect(handlerSpy.calls[0].args[1]).toEqual(mockElement);
-                expect(handlerSpy.calls[0].args[2]).toBeUndefined();
-                expect(handlerSpy.calls[0].args[3]).toEqual(mockAttributes);
-                expect(handlerSpy.calls[0].args[4]).toEqual(false);
-                expect(handlerSpy.calls[0].args[5]).toEqual('alpha');
+
+                expect(handlerSpy.calls[0].args.length).toEqual(1);
+
+                params = handlerSpy.calls[0].args[0];
+
+                expect(params.eventName).toBeDefined('eventName');
+                expect(params.elementPath).toBeDefined('elementPath');
+                expect(params.attrs).toBeDefined('attrs');
+                expect(params.hasValueChange).toBeDefined('hasValueChange');
+                expect(params.hasAttributeChange).toBeDefined('hasAttributeChange');
+
+                expect(params).toEqual(expectedParams);
+            });
+        });
+    });
+
+    describe('GIVEN a DOM Node element is binded by "change" event to an observable element', function () {
+        var mockDomNode = document.createElement('div'),
+            // handlerSpy = jasmine.createSpy('handlerSpy'),
+            mockValue = 'test',
+            mockPath = 'a.b.c';
+
+        beforeEach(function () {
+            SUT.bind(mockPath, mockDomNode, ['change']);
+        });
+
+        describe('AND there is a subscription to "change" on an element', function () {
+            var handlerSpy;
+
+            beforeEach(function () {
+                handlerSpy = jasmine.createSpy('handlerSpy');
+                SUT.subscribe(mockPath, 'change', handlerSpy);
+            });
+
+            describe('WHEN the DOM elements value has changed ', function () {
+                var mockEvent;
+
+                beforeEach(function () {
+                    mockEvent = document.createEvent('Event');
+
+                    mockEvent.initEvent('change', true, true);
+
+                    mockDomNode.value = mockValue;
+                    mockDomNode.dispatchEvent(mockEvent);
+                });
+
+                it('THEN the propertys value should be changed', function () {
+                    expect(SUT.get(mockPath)).toEqual(mockValue);
+                });
+
+                it('THEN the handler function should be called with parametes containing the dom event', function () {
+                    var params;
+
+                    expect(handlerSpy).toHaveBeenCalled();
+                    expect(handlerSpy.calls.length).toEqual(1);
+
+                    expect(handlerSpy.calls[0].args.length).toEqual(1);
+
+                    params = handlerSpy.calls[0].args[0];
+
+                    expect(params.domEventName).toBeDefined();
+                    expect(params.domEventName).toEqual('change')
+
+                    expect(params.domEvent).toBeDefined();
+                    expect(params.domEvent).toEqual(mockEvent);
+                });
             });
         });
     });

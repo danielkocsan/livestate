@@ -13,7 +13,8 @@
                 treeBrach[elementName] = {
                     attrs: {},
                     handlers: {},
-                    children: {}
+                    children: {},
+                    domElements: []
                 };
             }
 
@@ -22,11 +23,11 @@
             }
         }
 
-        function setElementValue(elementPath, value) {
+        function setElementValue(elementPath, value, domEvent) {
             var element = getTreeElement(elementPath.split('.'), state);
 
             element.value = value;
-            callHandlerFunction(element, elementPath, 'change', true);
+            callHandlerFunction(element, elementPath, 'change', true, undefined, domEvent);
         }
 
         function getTreeElement (elements, treeBrach) {
@@ -75,25 +76,57 @@
         }
 
         function addHandlerFunction(elementPath, eventName, handlerFunction) {
-            state[elementPath].handlers[eventName] = handlerFunction;
+            var element = getTreeElement(elementPath.split('.'), state);
+
+            element.handlers[eventName] = handlerFunction;
         }
 
-        function callHandlerFunction(element, elementPath, eventName, valueChanged, changeAttributeName) {
+        function callHandlerFunction(element, elementPath, eventName, isValueChanged, changedAttributeName, domEvent) {
+            var params;
+
             if (element.handlers[eventName]) {
-                element.handlers[eventName].call(
-                    this,
-                    eventName,
-                    elementPath,
-                    getElementValue(elementPath),
-                    getElementAttribute(elementPath, '*'),
-                    valueChanged,
-                    changeAttributeName
-                );
+                params = {
+                    eventName: eventName,
+                    elementPath: elementPath,
+                    value: element.value,
+                    attrs: element.attrs,
+                    hasValueChange: isValueChanged,
+                    hasAttributeChange: !isValueChanged,
+                    changedAttributeName: changedAttributeName,
+                    domEvent: domEvent
+                };
+
+                if (domEvent && domEvent.type) {
+                    params.domEventName = domEvent.type;
+                }
+
+                element.handlers[eventName].call(this, params);
             }
         }
 
         function getChildrenArray (elementPath) {
             return Object.keys(state[elementPath].children);
+        }
+
+        function handleDomEvent (elementPath, domNode, event) {
+            setElementValue(elementPath, domNode.value, event);
+        }
+
+        function bindDomEvent (elementPath, domNode, domEventName) {
+            var handlerFunction = handleDomEvent.bind(this, elementPath, domNode);
+
+            domNode.addEventListener(domEventName, handlerFunction, false);
+        }
+
+        function bindNodeElement (elementPath, domNode, events) {
+            var element = getTreeElement(elementPath.split('.'), state);
+
+            element.domElements.push({
+                element: domNode,
+                events: events
+            });
+
+            events.forEach(bindDomEvent.bind(this, elementPath, domNode));
         }
 
         return {
@@ -129,7 +162,9 @@
             reset: function () {
                 emptyState();
             },
-            bind: function () {
+            bind: function (elementPath, nodeElement, domEvents) {
+                createElement(elementPath);
+                bindNodeElement(elementPath, nodeElement, domEvents);
             }
         };
     };

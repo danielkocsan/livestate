@@ -14,5 +14,5 @@
     "nomen" : true,
     "undef": true,
     "unused": true,
-    "predef": [ "$", "dio", "jasmine", "describe", "beforeEach", "afterEach", "it", "expect", "runs", "waitsFor", "window" ]
+    "predef": [ "$", "di", "jasmine", "describe", "beforeEach", "afterEach", "it", "expect", "runs", "waitsFor", "window" ]
 }

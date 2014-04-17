@@ -14,14 +14,17 @@ module.exports = function(grunt) {
                 js: {
                     files: ['specs/**/*.js', 'src/**/*.js'],
                     tasks: ['jshint', 'jasmine']
-                },
+                }
             },
 
             jshint: {
                 all: [
                     'specs/**/*.js',
                     'src/**/*.js'
-                ]
+                ],
+                options: {
+                    jshintrc: '.jshintrc'
+                }
             }
         }
     );

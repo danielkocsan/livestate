@@ -8,7 +8,7 @@ describe('LiveState object', function () {
         };
 
     beforeEach(function () {
-        SUT = dio.di.getCustomInstance('State');
+        SUT = di.getCustomInstance('State');
         SUT.reset();
     });
 
@@ -21,7 +21,7 @@ describe('LiveState object', function () {
         itHasAMethod('bind');
     });
 
-    describe("GIVEN an element's value is set", function () {
+    describe('GIVEN an elements value is set', function () {
         var mockPath = 'a',
             mockValue = 'test';
 
@@ -29,13 +29,13 @@ describe('LiveState object', function () {
             SUT.set(mockPath, mockValue);
         });
 
-        describe("WHEN get method has called with the elementName only", function () {
+        describe('WHEN get method has called with the elementName only', function () {
             it('THEN it returns the set value', function () {
                 expect(SUT.get(mockPath)).toEqual(mockValue);
             });
         });
 
-        describe("GIVEN a child element's value is set", function () {
+        describe('GIVEN a child elements value is set', function () {
             var childMockProperty = 'a.b',
                 childMockValue = 'childElementValue';
 
@@ -43,20 +43,20 @@ describe('LiveState object', function () {
                 SUT.set(childMockProperty, childMockValue);
             });
 
-            describe("WHEN get method has called with the elementName only THEN", function () {
-                it('returns the set value', function () {
+            describe('WHEN get method has called with the elementName only', function () {
+                it('THEN returns the set value', function () {
                     expect(SUT.get(childMockProperty)).toEqual(childMockValue);
                 });
             });
 
-            describe("WHEN get method has called with the parent element's name only THEN", function () {
-                it('returns the set value', function () {
+            describe('WHEN get method has called with the parent elements name only', function () {
+                it(' THEN returns the set value', function () {
                     expect(SUT.get(mockPath)).toEqual(mockValue);
                 });
             });
         });
         
-        describe("WHEN reset method has called", function () {
+        describe('WHEN reset method has called', function () {
             beforeEach(function () {
                 SUT.reset();
             });
@@ -68,7 +68,7 @@ describe('LiveState object', function () {
     });
     
     
-    describe("GIVEN an element's attributes are set", function () {
+    describe('GIVEN an elements attributes are set', function () {
         var mockPath = 'a',
             mockAttributes = {
                 alpha: 'alpha',
@@ -82,7 +82,7 @@ describe('LiveState object', function () {
             SUT.set(mockPath, mockAttributes.charlie, 'charlie');
         });
         
-        describe("WHEN get method has called with the elementName and the attribure name", function () {
+        describe('WHEN get method has called with the elementName and the attribure name', function () {
             it('THEN it returns the set value', function () {
                 expect(SUT.get(mockPath, 'alpha')).toEqual(mockAttributes.alpha);
                 expect(SUT.get(mockPath, 'bravo')).toEqual(mockAttributes.bravo);
@@ -90,20 +90,20 @@ describe('LiveState object', function () {
             });
         });
         
-        describe("WHEN get method has called with the elementName only", function () {
+        describe('WHEN get method has called with the elementName only', function () {
             it('THEN it returns undefined', function () {
                 expect(SUT.get(mockPath)).toBeUndefined();
             });
         });
 
-        describe("WHEN get method has called with the elementName and '*'", function () {
+        describe('WHEN get method has called with the elementName and "*"', function () {
             it('THEN it returns the attributes object', function () {
                 expect(SUT.get(mockPath, '*')).toEqual(mockAttributes);
             });
         });
     });
 
-    describe("GIVEN there is a subscription to 'change' on an element", function () {
+    describe('GIVEN there is a subscription to "change" on an element', function () {
         var handlerSpy,
             mockElement = 'b',
             mockValue = 'test',
@@ -116,7 +116,7 @@ describe('LiveState object', function () {
             SUT.subscribe(mockElement, 'change', handlerSpy);
         });
         
-        describe("WHEN the property's value has changed", function () {
+        describe('WHEN the propertys value has changed', function () {
 
             beforeEach(function () {
                 SUT.set(mockElement, mockValue);
@@ -134,7 +134,7 @@ describe('LiveState object', function () {
             });
         });
 
-        describe("WHEN the property's any attribute changed", function () {
+        describe('WHEN the propertys any attribute changed', function () {
 
             beforeEach(function () {
                 SUT.set(mockElement, mockAttributes.alpha, 'alpha');

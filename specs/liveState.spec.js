@@ -19,6 +19,7 @@ describe('LiveState object', function () {
         itHasAMethod('subscribe');
         itHasAMethod('reset');
         itHasAMethod('bind');
+        itHasAMethod('getChildren');
     });
 
     describe('GIVEN an elements value is set', function () {
@@ -52,6 +53,14 @@ describe('LiveState object', function () {
             describe('WHEN get method has called with the parent elements name only', function () {
                 it(' THEN returns the set value', function () {
                     expect(SUT.get(mockPath)).toEqual(mockValue);
+                });
+            });
+
+            describe('WHEN getChildren() has called', function () {
+                it('THEN it returns an array of strings of the next level children', function () {
+                    var expectedValue = ['b'];
+
+                    expect(SUT.getChildren('a')).toEqual(expectedValue);
                 });
             });
         });
@@ -99,6 +108,29 @@ describe('LiveState object', function () {
         describe('WHEN get method has called with the elementName and "*"', function () {
             it('THEN it returns the attributes object', function () {
                 expect(SUT.get(mockPath, '*')).toEqual(mockAttributes);
+            });
+        });
+    });
+
+    describe('GIVEN a child element attributes are set', function () {
+        var mockPath = 'a.b.c',
+            mockAttributes = {
+                alpha: 'alpha',
+                bravo: 'bravo',
+                charlie: 'charlie'
+            };
+
+        beforeEach(function () {
+            SUT.set(mockPath, mockAttributes.alpha, 'alpha');
+            SUT.set(mockPath, mockAttributes.bravo, 'bravo');
+            SUT.set(mockPath, mockAttributes.charlie, 'charlie');
+        });
+
+        describe('WHEN get method has called with the elementName and the attribure name', function () {
+            it('THEN it returns the set value', function () {
+                expect(SUT.get(mockPath, 'alpha')).toEqual(mockAttributes.alpha);
+                expect(SUT.get(mockPath, 'bravo')).toEqual(mockAttributes.bravo);
+                expect(SUT.get(mockPath, 'charlie')).toEqual(mockAttributes.charlie);
             });
         });
     });

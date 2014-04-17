@@ -2,42 +2,69 @@
     var State = function () {
         var state = {};
 
-        function createElement(elementPath) {
-            if (!state[elementPath]) {
-                state[elementPath] = {
+        function createElement (elementPath) {
+            buildTree(elementPath.split('.'), state);
+        }
+
+        function buildTree (elements, treeBrach) {
+            var elementName = elements.shift();
+
+            if (!treeBrach[elementName]) {
+                treeBrach[elementName] = {
                     attrs: {},
-                    handlers: {}
+                    handlers: {},
+                    children: {}
                 };
+            }
+
+            if (elements.length > 0) {
+                buildTree(elements, treeBrach[elementName].children);
             }
         }
 
         function setElementValue(elementPath, value) {
-            state[elementPath].value = value;
-            callHandlerFunction(elementPath, 'change', true);
+            var element = getTreeElement(elementPath.split('.'), state);
+
+            element.value = value;
+            callHandlerFunction(element, elementPath, 'change', true);
+        }
+
+        function getTreeElement (elements, treeBrach) {
+            var elementName = elements.shift();
+
+            if (elements.length > 0) {
+                return getTreeElement(elements, treeBrach[elementName].children);
+            }
+
+            return treeBrach[elementName];
         }
 
         function getElementValue (elementPath) {
-            var result;
+            var element = getTreeElement(elementPath.split('.'), state),
+                result;
 
-            if (state[elementPath] && state[elementPath].value) {
-                result = state[elementPath].value;
+            if (element && element.value) {
+                result = element.value;
             }
 
             return result;
         }
 
         function setElementAttribute(elementPath, attributeName, attributeValue) {
-            state[elementPath].attrs[attributeName] = attributeValue;
-            callHandlerFunction(elementPath, 'change', false, attributeName);
+            var element = getTreeElement(elementPath.split('.'), state);
+
+            element.attrs[attributeName] = attributeValue;
+            callHandlerFunction(element, elementPath, 'change', false, attributeName);
         }
 
         function getElementAttribute(elementPath, attributeName) {
-            var result;
+            var result,
+                element = getTreeElement(elementPath.split('.'), state);
 
             if (attributeName === '*') {
-                result = state[elementPath].attrs;
+                result = element.attrs;
             } else {
-                result = state[elementPath].attrs[attributeName];
+                result = element.attrs[attributeName];
             }
 
             return result;
@@ -51,9 +78,9 @@
             state[elementPath].handlers[eventName] = handlerFunction;
         }
 
-        function callHandlerFunction(elementPath, eventName, valueChanged, changeAttributeName) {
-            if (state[elementPath].handlers[eventName]) {
-                state[elementPath].handlers[eventName].call(
+        function callHandlerFunction(element, elementPath, eventName, valueChanged, changeAttributeName) {
+            if (element.handlers[eventName]) {
+                element.handlers[eventName].call(
                     this,
                     eventName,
                     elementPath,
@@ -63,6 +90,10 @@
                     changeAttributeName
                 );
             }
+        }
+
+        function getChildrenArray (elementPath) {
+            return Object.keys(state[elementPath].children);
         }
 
         return {
@@ -87,6 +118,9 @@
                 return result;
             },
             getDOM: function () {
+            },
+            getChildren: function (elementPath) {
+                return getChildrenArray(elementPath);
             },
             subscribe: function (elementPath, eventName, handlerFunction) {
                 createElement(elementPath);

@@ -10,7 +10,7 @@ It should have a getChildren() method
 It should have a subscribe() method
 It should have a reset() method
 It should have a bind() method
-*It should have a extend() method
+It should have a extend() method
 
 
 -
@@ -18,9 +18,7 @@ GIVEN a element's value is set
 WHEN we call get method with the path only
 THEN it returns the set value
 
-
--
-GIVEN a child element's value is set
+AND a child element's value is set
 
 WHEN we call get method with the path only
 THEN it returns the set value
@@ -28,9 +26,9 @@ THEN it returns the set value
 WHEN we call getChildren()
 THEN it returns an array of strings of the next level children
 
-*WHEN we call extend() with an object
-*AND get is called on extended path
-*THEN it returns the set value
+WHEN we call extend() with an object
+AND get is called on extended path
+THEN it returns the set value
 
 *WHEN we call extend() with an object
 *AND get is called on merged path

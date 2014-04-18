@@ -41,10 +41,23 @@
         }
 
         function setElementValue(elementPath, value, domEvent) {
-            var element = getTreeElement(elementPath.split('.'), state);
+            var element = getTreeElement(elementPath.split('.'), state),
+                parents;
 
             element.value = value;
             callHandlerFunction(element, elementPath, 'change', true, undefined, domEvent);
+            parents = getParents(elementPath.split('.'));
+            filterChildrenChangeHandlers(parents).forEach(function (element) {
+                callHandlerFunction(element, elementPath, 'childrenChange', true, undefined, domEvent);
+            });
+        }
+
+        function filterChildrenChangeHandlers (elements) {
+            return elements.filter(function (element) {
+                if (element.handlers.childrenChange) {
+                    return element;
+                }
+            });
         }
 
         function getTreeElement (elements, treeBrach) {
@@ -122,16 +135,60 @@
             }
         }
 
+        function getParents (pathElements) {
+            var parentPathElements = pathElements.slice(0),
+                element,
+                parents,
+                result = [];
+
+            parentPathElements.pop();
+            if (parentPathElements.length > 0) {
+                element = getTreeElement(parentPathElements, state);
+                parents = getParents(parentPathElements);
+
+                result = [element];
+                if (parents.length > 0) {
+                    result = result.concat(parents);
+                }
+            }
+
+            return result;
+        }
+
         function getChildrenArray (elementPath) {
             return Object.keys(state[elementPath].children);
         }
 
-        function handleDomEvent (elementPath, domNode, event) {
-            setElementValue(elementPath, domNode.value, event);
+        function syncDomNodeToElement (elementPath, domNode, event) {
+            var domNodeValue = getDomNodeValue(domNode);
+
+            setElementValue(elementPath, domNodeValue, event);
+        }
+
+        /*
+        function setDomNodeValue (domNode) {
+            if (domNode.nodeName === 'INPUT' || domNode.nodeName === 'SELECT' || domNode.nodeName === 'TEXTAREA') {
+                domNode.value = value;
+            } else {
+                $(domNode).html(value);
+            }
+        }
+        */
+
+        function getDomNodeValue (domNode) {
+            var value;
+
+            if (domNode.nodeName === 'INPUT' || domNode.nodeName === 'SELECT' || domNode.nodeName === 'TEXTAREA') {
+                value = domNode.value;
+            } else {
+                value = domNode.innerHTML;
+            }
+
+            return value;
         }
 
         function bindDomEvent (elementPath, domNode, domEventName) {
-            var handlerFunction = handleDomEvent.bind(this, elementPath, domNode);
+            var handlerFunction = syncDomNodeToElement.bind(this, elementPath, domNode);
 
             domNode.addEventListener(domEventName, handlerFunction, false);
         }
@@ -143,6 +200,8 @@
                 element: domNode,
                 events: events
             });
+
+            syncDomNodeToElement (elementPath, domNode);
 
             events.forEach(bindDomEvent.bind(this, elementPath, domNode));
         }

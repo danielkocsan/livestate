@@ -8,11 +8,12 @@
 
         function buildTree(elements, treeBrach) {
             var pathElements = elements.slice(0),
-                elementName = pathElements.shift();
+                elementName = pathElements.shift(),
+                path = treeBrach.path ? treeBrach.path + '.' + elements.join('.') : elements.join('.');
 
             if (!treeBrach[elementName]) {
                 treeBrach[elementName] = {
-                    path: elements.join('.'),
+                    path: path,
                     attrs: {},
                     handlers: {},
                     children: {},

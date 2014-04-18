@@ -50,6 +50,8 @@
             filterChildrenChangeHandlers(parents).forEach(function (element) {
                 callHandlerFunction(element, elementPath, 'childrenChange', true, undefined, domEvent);
             });
+
+            element.domElements.forEach(setDomNodeValue.bind(this, value));
         }
 
         function filterChildrenChangeHandlers (elements) {
@@ -165,15 +167,13 @@
             setElementValue(elementPath, domNodeValue, event);
         }
 
-        /*
-        function setDomNodeValue (domNode) {
+        function setDomNodeValue (value, domNode) {
             if (domNode.nodeName === 'INPUT' || domNode.nodeName === 'SELECT' || domNode.nodeName === 'TEXTAREA') {
                 domNode.value = value;
             } else {
-                $(domNode).html(value);
+                domNode.innerHTML = value;
             }
         }
-        */
 
         function getDomNodeValue (domNode) {
             var value;
@@ -196,10 +196,7 @@
         function bindNodeElement (elementPath, domNode, events) {
             var element = getTreeElement(elementPath.split('.'), state);
 
-            element.domElements.push({
-                element: domNode,
-                events: events
-            });
+            element.domElements.push(domNode);
 
             syncDomNodeToElement (elementPath, domNode);
 
@@ -227,7 +224,10 @@
 
                 return result;
             },
-            getDOM: function () {
+            getDOM: function (elementPath) {
+                var element = getTreeElement(elementPath.split('.'), state);
+
+                return element.domElements;
             },
             getChildren: function (elementPath) {
                 return getChildrenArray(elementPath);

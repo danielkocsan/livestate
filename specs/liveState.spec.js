@@ -384,9 +384,13 @@ describe('LiveState object', function () {
 
     describe('GIVEN there is a dom node with set value', function () {
 
-        var domNode = document.createElement('div'),
+        var domNode,
             mockPath = 'a.b.c.d',
             mockValue = 'nodeTest';
+
+        beforeEach(function () {
+            domNode = document.createElement('div');
+        });
 
         describe('WHEN we bind it to an element', function () {
 
@@ -399,8 +403,35 @@ describe('LiveState object', function () {
             it('THEN the propertys value is equal to the dom elements value', function () {
                expect(SUT.get(mockPath)).toEqual(mockValue);
             });
+
+            describe('AND getDOM() has called', function () {
+                var domElements;
+
+                beforeEach(function () {
+                    domElements = SUT.getDOM(mockPath);
+                });
+
+                it('THEN it should return an array containing attached dom elements', function () {
+                    expect(domElements).toBeDefined();
+                    expect(domElements.length).toEqual(1);
+                    expect(domElements[0]).toEqual(domNode);
+                });
+            });
+
+            describe('AND propertys value has changed', function () {
+                var changedValue = 'changed',
+                    domElements;
+
+                beforeEach(function () {
+                    SUT.set(mockPath, changedValue);
+                    domElements = SUT.getDOM(mockPath);
+                });
+
+                it('THEN the dom nodes value should be updated', function () {
+                    expect(domElements[0]).toEqual(domNode);
+                    expect(domElements[0].innerHTML).toEqual(changedValue);
+                });
+            });
         });
     });
-
-
 });

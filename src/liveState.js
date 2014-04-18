@@ -1,5 +1,5 @@
 (function () {
-    var State = function () {
+    var LiveState = function () {
         var state = {};
 
         function createElement(pathElements) {
@@ -263,5 +263,5 @@
             }
         };
     };
-    di.register('State', State);
+    di.register('LiveState', LiveState);
 }());

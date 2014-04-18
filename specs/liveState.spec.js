@@ -358,6 +358,7 @@ describe('LiveState object', function () {
             it('THEN attached handler on parent element is called with proper parameters', function () {
                 var params,
                     expectedParams = {
+                        subscriptionElementPath: parentElementPath,
                         eventName: 'childrenChange',
                         elementPath: childElementPath,
                         value: childMockValue,

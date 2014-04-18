@@ -12,6 +12,7 @@
 
             if (!treeBrach[elementName]) {
                 treeBrach[elementName] = {
+                    path: elements.join('.'),
                     attrs: {},
                     handlers: {},
                     children: {},
@@ -59,6 +60,7 @@
             filterChildrenChangeHandlers(parents).forEach(function (parent) {
                 var data = {
                     elementPath: elementPath,
+                    subscriptionElementPath: parent.path,
                     domEvent: domEvent,
                     eventName: 'childrenChange',
                     hasValueChange: true,

@@ -8,12 +8,10 @@
 
         function buildTree(elements, treeBrach) {
             var pathElements = elements.slice(0),
-                elementName = pathElements.shift(),
-                path = treeBrach.path ? treeBrach.path + '.' + elements.join('.') : elements.join('.');
+                elementName = pathElements.shift();
 
             if (!treeBrach[elementName]) {
                 treeBrach[elementName] = {
-                    path: path,
                     attrs: {},
                     handlers: {},
                     children: {},
@@ -69,7 +67,7 @@
                     hasAttributeChange: false,
                     attrs: element.attrs
                 };
-                callHandlerFunction(parent, data);
+                callHandlerFunction(parent.element, data);
             });
 
             element.domElements.forEach(setDomNodeValue.bind(this, value));
@@ -77,7 +75,7 @@
 
         function filterChildrenChangeHandlers(elements) {
             return elements.filter(function (element) {
-                if (element.handlers.childrenChange) {
+                if (element.element.handlers.childrenChange) {
                     return element;
                 }
             });
@@ -166,7 +164,7 @@
                 element = getTreeElement(parentPathElements, state);
                 parents = getParents(parentPathElements);
 
-                result = [element];
+                result = [{element: element, path: parentPathElements.join('.')}];
                 if (parents.length > 0) {
                     result = result.concat(parents);
                 }

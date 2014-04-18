@@ -20,6 +20,7 @@ describe('LiveState object', function () {
         itHasAMethod('reset');
         itHasAMethod('bind');
         itHasAMethod('getChildren');
+        itHasAMethod('extend');
     });
 
     describe('GIVEN an elements value is set', function () {
@@ -269,6 +270,40 @@ describe('LiveState object', function () {
                     expect(params.domEvent).toBeDefined();
                     expect(params.domEvent).toEqual(mockEvent);
                 });
+            });
+        });
+    });
+
+    describe('WHEN we call extend() with a path and an object', function () {
+        var mockPath = 'a.b',
+            mockExtendObject = {
+                value: 'rootValue',
+                attrs: {
+                    'rootAtribute': 'rootAtributeValue'
+                },
+                children: {
+                    'c': {
+                        value: 'nodeValue',
+                        attrs: {
+                            'nodeAtribute': 'nodeAtributeValue'
+                        }
+                    }
+                }
+            };
+
+        beforeEach(function () {
+            SUT.extend(mockPath, mockExtendObject);
+        });
+        describe('AND get is called on extended path', function () {
+
+            var value;
+
+            beforeEach(function () {
+                value = SUT.get('a.b.c');
+            });
+
+            it('THEN it returns the set value', function () {
+                expect(value).toEqual('nodeValue');
             });
         });
     });

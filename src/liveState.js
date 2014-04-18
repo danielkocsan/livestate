@@ -2,12 +2,13 @@
     var State = function () {
         var state = {};
 
-        function createElement (elementPath) {
-            buildTree(elementPath.split('.'), state);
+        function createElement (pathElements) {
+            return buildTree(pathElements, state);
         }
 
         function buildTree (elements, treeBrach) {
-            var elementName = elements.shift();
+            var pathElements = elements.slice(0),
+                elementName = pathElements.shift();
 
             if (!treeBrach[elementName]) {
                 treeBrach[elementName] = {
@@ -18,8 +19,24 @@
                 };
             }
 
-            if (elements.length > 0) {
-                buildTree(elements, treeBrach[elementName].children);
+            if (pathElements.length > 0) {
+                return buildTree(pathElements, treeBrach[elementName].children);
+            }
+
+            return treeBrach[elementName];
+        }
+
+        function extendTree (pathElements, extendObject) {
+            var element = createElement(pathElements);
+
+            element.value = extendObject.value;
+            element.attrs = extendObject.attrs;
+            if (extendObject.children) {
+                Object.keys(extendObject.children).forEach(function (childrenName) {
+                    var nextPathElements = pathElements.slice(0);
+                    nextPathElements.push(childrenName);
+                    extendTree(nextPathElements, extendObject.children[childrenName]);
+                });
             }
         }
 
@@ -31,10 +48,11 @@
         }
 
         function getTreeElement (elements, treeBrach) {
-            var elementName = elements.shift();
+            var pathElements = elements.slice(0),
+                elementName = pathElements.shift();
 
-            if (elements.length > 0) {
-                return getTreeElement(elements, treeBrach[elementName].children);
+            if (pathElements.length > 0) {
+                return getTreeElement(pathElements, treeBrach[elementName].children);
             }
 
             return treeBrach[elementName];
@@ -131,7 +149,7 @@
 
         return {
             set: function (elementPath, value, attributeName) {
-                createElement(elementPath);
+                createElement(elementPath.split('.'));
 
                 if (attributeName) {
                     setElementAttribute(elementPath, attributeName, value);
@@ -156,15 +174,18 @@
                 return getChildrenArray(elementPath);
             },
             subscribe: function (elementPath, eventName, handlerFunction) {
-                createElement(elementPath);
+                createElement(elementPath.split('.'));
                 addHandlerFunction(elementPath, eventName, handlerFunction);
             },
             reset: function () {
                 emptyState();
             },
             bind: function (elementPath, nodeElement, domEvents) {
-                createElement(elementPath);
+                createElement(elementPath.split('.'));
                 bindNodeElement(elementPath, nodeElement, domEvents);
+            },
+            extend: function (path, extendObject) {
+                extendTree(path.split('.'), extendObject);
             }
         };
     };

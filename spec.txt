@@ -25,8 +25,8 @@ GIVEN a child element's value is set
 WHEN we call get method with the path only
 THEN it returns the set value
 
-*WHEN we call getChildren()
-*THEN it returns an array of strings of the next level children
+WHEN we call getChildren()
+THEN it returns an array of strings of the next level children
 
 *WHEN we call extend() with an object
 *AND get is called on extended path

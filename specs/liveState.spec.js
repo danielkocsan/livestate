@@ -6,6 +6,15 @@ describe('LiveState object', function () {
                 expect(typeof SUT[methodName]).toEqual('function');
             });
         },
+        objectsAreEqual = function (a, b) {
+            Object.keys(a).forEach(function (key) {
+                if (a[key] !== undefined) {
+                    expect(b[key]).toBeDefined(key);
+                }
+                expect(b[key]).toEqual(a[key],key);
+            });
+            expect(a).toEqual(b);
+        },
         triggerEvent = function (domNode, eventType) {
             var mockEvent = document.createEvent('Event');
 
@@ -264,10 +273,10 @@ describe('LiveState object', function () {
                         eventName: 'change',
                         elementPath: mockElement,
                         value: mockValue,
-                        attrs: {},
                         hasValueChange: true,
                         hasAttributeChange: false,
-                        changedAttributeName: undefined
+                        changedAttributeName: undefined,
+                        attrs: {}
                     };
 
                 expect(handlerSpy).toHaveBeenCalled();
@@ -275,15 +284,7 @@ describe('LiveState object', function () {
                 expect(handlerSpy.calls[0].args.length).toEqual(1);
 
                 params = handlerSpy.calls[0].args[0];
-
-                expect(params.eventName).toBeDefined();
-                expect(params.elementPath).toBeDefined();
-                expect(params.value).toBeDefined();
-                expect(params.attrs).toBeDefined();
-                expect(params.hasValueChange).toBeDefined();
-                expect(params.hasAttributeChange).toBeDefined();
-
-                expect(params).toEqual(expectedParams);
+                objectsAreEqual(expectedParams,params);
             });
         });
 
@@ -302,7 +303,8 @@ describe('LiveState object', function () {
                         attrs: mockAttributes,
                         hasValueChange: false,
                         hasAttributeChange: true,
-                        changedAttributeName: 'alpha'
+                        changedAttributeName: 'alpha',
+                        changedAttributeValue : 'alpha'
                     };
 
                 expect(handlerSpy).toHaveBeenCalled();
@@ -311,14 +313,7 @@ describe('LiveState object', function () {
                 expect(handlerSpy.calls[0].args.length).toEqual(1);
 
                 params = handlerSpy.calls[0].args[0];
-
-                expect(params.eventName).toBeDefined('eventName');
-                expect(params.elementPath).toBeDefined('elementPath');
-                expect(params.attrs).toBeDefined('attrs');
-                expect(params.hasValueChange).toBeDefined('hasValueChange');
-                expect(params.hasAttributeChange).toBeDefined('hasAttributeChange');
-
-                expect(params).toEqual(expectedParams);
+                objectsAreEqual(expectedParams,params);
             });
         });
     });
@@ -347,8 +342,20 @@ describe('LiveState object', function () {
             });
 
             it('THEN attached handler on parent element is called with proper parameters', function () {
+                var params,
+                    expectedParams = {
+                        eventName: 'childrenChange',
+                        elementPath: childElementPath,
+                        value: childMockValue,
+                        attrs: {},
+                        hasValueChange: true,
+                        hasAttributeChange: false
+                    };
+
                 expect(handlerSpy).toHaveBeenCalled();
                 expect(handlerSpy.calls.length).toEqual(1);
+                params = handlerSpy.calls[0].args[0];
+                objectsAreEqual(expectedParams,params);
             });
         });
     });

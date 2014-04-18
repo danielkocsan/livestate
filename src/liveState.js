@@ -2,11 +2,11 @@
     var State = function () {
         var state = {};
 
-        function createElement (pathElements) {
+        function createElement(pathElements) {
             return buildTree(pathElements, state);
         }
 
-        function buildTree (elements, treeBrach) {
+        function buildTree(elements, treeBrach) {
             var pathElements = elements.slice(0),
                 elementName = pathElements.shift();
 
@@ -26,7 +26,7 @@
             return treeBrach[elementName];
         }
 
-        function extendTree (pathElements, extendObject) {
+        function extendTree(pathElements, extendObject) {
             var element = createElement(pathElements);
 
             element.value = extendObject.value;
@@ -42,19 +42,37 @@
 
         function setElementValue(elementPath, value, domEvent) {
             var element = getTreeElement(elementPath.split('.'), state),
-                parents;
+                parents,
+                data = {
+                    elementPath: elementPath,
+                    domEvent: domEvent,
+                    eventName: 'change',
+                    hasValueChange: true,
+                    value: value,
+                    hasAttributeChange: false,
+                    attrs: element.attrs
+                };
 
             element.value = value;
-            callHandlerFunction(element, elementPath, 'change', true, undefined, domEvent);
+            callHandlerFunction(element, data);
             parents = getParents(elementPath.split('.'));
-            filterChildrenChangeHandlers(parents).forEach(function (element) {
-                callHandlerFunction(element, elementPath, 'childrenChange', true, undefined, domEvent);
+            filterChildrenChangeHandlers(parents).forEach(function (parent) {
+                var data = {
+                    elementPath: elementPath,
+                    domEvent: domEvent,
+                    eventName: 'childrenChange',
+                    hasValueChange: true,
+                    value: value,
+                    hasAttributeChange: false,
+                    attrs: element.attrs
+                };
+                callHandlerFunction(parent, data);
             });
 
             element.domElements.forEach(setDomNodeValue.bind(this, value));
         }
 
-        function filterChildrenChangeHandlers (elements) {
+        function filterChildrenChangeHandlers(elements) {
             return elements.filter(function (element) {
                 if (element.handlers.childrenChange) {
                     return element;
@@ -62,7 +80,7 @@
             });
         }
 
-        function getTreeElement (elements, treeBrach) {
+        function getTreeElement(elements, treeBrach) {
             var pathElements = elements.slice(0),
                 elementName = pathElements.shift();
 
@@ -73,7 +91,7 @@
             return treeBrach[elementName];
         }
 
-        function getElementValue (elementPath) {
+        function getElementValue(elementPath) {
             var element = getTreeElement(elementPath.split('.'), state),
                 result;
 
@@ -88,7 +106,16 @@
             var element = getTreeElement(elementPath.split('.'), state);
 
             element.attrs[attributeName] = attributeValue;
-            callHandlerFunction(element, elementPath, 'change', false, attributeName);
+            var data = {
+                elementPath: elementPath,
+                eventName: 'change',
+                hasValueChange: false,
+                hasAttributeChange: true,
+                attrs: element.attrs,
+                changedAttributeName: attributeName,
+                changedAttributeValue: attributeValue
+            };
+            callHandlerFunction(element, data);
         }
 
         function getElementAttribute(elementPath, attributeName) {
@@ -104,7 +131,7 @@
             return result;
         }
 
-        function emptyState () {
+        function emptyState() {
             state = {};
         }
 
@@ -114,30 +141,18 @@
             element.handlers[eventName] = handlerFunction;
         }
 
-        function callHandlerFunction(element, elementPath, eventName, isValueChanged, changedAttributeName, domEvent) {
-            var params;
+        function callHandlerFunction(element, data) {
+            if (element.handlers[data.eventName]) {
 
-            if (element.handlers[eventName]) {
-                params = {
-                    eventName: eventName,
-                    elementPath: elementPath,
-                    value: element.value,
-                    attrs: element.attrs,
-                    hasValueChange: isValueChanged,
-                    hasAttributeChange: !isValueChanged,
-                    changedAttributeName: changedAttributeName,
-                    domEvent: domEvent
-                };
-
-                if (domEvent && domEvent.type) {
-                    params.domEventName = domEvent.type;
+                if (data.domEvent && data.domEvent.type) {
+                    data.domEventName = data.domEvent.type;
                 }
 
-                element.handlers[eventName].call(this, params);
+                element.handlers[data.eventName].call(this, data);
             }
         }
 
-        function getParents (pathElements) {
+        function getParents(pathElements) {
             var parentPathElements = pathElements.slice(0),
                 element,
                 parents,
@@ -157,17 +172,17 @@
             return result;
         }
 
-        function getChildrenArray (elementPath) {
+        function getChildrenArray(elementPath) {
             return Object.keys(state[elementPath].children);
         }
 
-        function syncDomNodeToElement (elementPath, domNode, event) {
+        function syncDomNodeToElement(elementPath, domNode, event) {
             var domNodeValue = getDomNodeValue(domNode);
 
             setElementValue(elementPath, domNodeValue, event);
         }
 
-        function setDomNodeValue (value, domNode) {
+        function setDomNodeValue(value, domNode) {
             if (domNode.nodeName === 'INPUT' || domNode.nodeName === 'SELECT' || domNode.nodeName === 'TEXTAREA') {
                 domNode.value = value;
             } else {
@@ -175,7 +190,7 @@
             }
         }
 
-        function getDomNodeValue (domNode) {
+        function getDomNodeValue(domNode) {
             var value;
 
             if (domNode.nodeName === 'INPUT' || domNode.nodeName === 'SELECT' || domNode.nodeName === 'TEXTAREA') {
@@ -187,18 +202,18 @@
             return value;
         }
 
-        function bindDomEvent (elementPath, domNode, domEventName) {
+        function bindDomEvent(elementPath, domNode, domEventName) {
             var handlerFunction = syncDomNodeToElement.bind(this, elementPath, domNode);
 
             domNode.addEventListener(domEventName, handlerFunction, false);
         }
 
-        function bindNodeElement (elementPath, domNode, events) {
+        function bindNodeElement(elementPath, domNode, events) {
             var element = getTreeElement(elementPath.split('.'), state);
 
             element.domElements.push(domNode);
 
-            syncDomNodeToElement (elementPath, domNode);
+            syncDomNodeToElement(elementPath, domNode);
 
             events.forEach(bindDomEvent.bind(this, elementPath, domNode));
         }

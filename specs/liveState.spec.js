@@ -72,7 +72,7 @@ describe('LiveState object', function () {
         };
 
     beforeEach(function () {
-        SUT = di.getCustomInstance('State');
+        SUT = di.getCustomInstance('LiveState');
         SUT.reset();
     });
 
@@ -188,8 +188,22 @@ describe('LiveState object', function () {
             });
         });
     });
-    
-    
+
+    describe('GIVEN an elements multiple child values are set', function () {
+        beforeEach(function () {
+            SUT.set('a.b.c', 'test1');
+            SUT.set('a.b.d', 'test2');
+        });
+
+        describe('WHEN getChildren() has called', function () {
+            it('THEN it returns an array of strings of the next level children', function () {
+                var expectedValue = ['c','d'];
+
+                expect(SUT.getChildren('a.b')).toEqual(expectedValue);
+            });
+        });
+    });
+
     describe('GIVEN an elements attributes are set', function () {
         var mockPath = 'a',
             mockAttributes = {

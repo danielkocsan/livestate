@@ -173,7 +173,8 @@
         }
 
         function getChildrenArray(elementPath) {
-            return Object.keys(state[elementPath].children);
+            var element = getTreeElement(elementPath.split('.'), state);
+            return Object.keys(element.children);
         }
 
         function syncDomNodeToElement(elementPath, domNode, event) {

@@ -4,8 +4,8 @@ LiveState is an extended object which stores elements in tree structure. Every e
 any children. Handler function can subscribe to a change of an element and also there is possibility to subscribe to
 any children element change. A change can be a value or an attribute change.
 Next to these LiveState also provides the possibility to bind dom elements to state elements. It creates two-way binding
-between the two so neither the dom element or the state element changes the other side value will be updated. Next to
-these it is possible the bind multiple dom elements to a state element. The binding event can be set and can be multiple.
+between the two so either the dom element or the state element changes the other side value will be updated. Beside these
+it is possible the bind multiple dom elements to a state element. The binding event can be set and can be multiple.
 So you can bind an input element to a state element and can define to sync them on every blur, onkeyup or change dom event.
 
 ##How can I use it?
